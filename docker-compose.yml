@@ -1,0 +1,44 @@
+services:
+  python:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/code
+      - ./bancos:/code/bancos
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app_network
+    environment:
+      - DATABASE_URL=postgresql://workout:workout@db:5432/workout
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=workout
+      - POSTGRES_PASSWORD=workout
+      - POSTGRES_DB=workout
+  db:
+    image: postgres:11-alpine
+    networks:
+      - app_network
+    environment:
+      POSTGRES_PASSWORD: workout
+      POSTGRES_USER: workout
+      POSTGRES_DB: workout
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U workout"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+
+networks:
+  app_network:
+    driver: bridge
