@@ -28,19 +28,38 @@ Teste: [http://localhost:8000/check-db](http://localhost:8000/check-db)<br /><br
 
 Acessar o container python
 ```sh
-    docker-compose exec python bash # Acessar o container
+# Acessar o container
+docker-compose exec python bash
 
-    make create-migrations d="init_db"
+# 1. Limpar migrações existentes (se necessário)
+rm -rf alembic/versions/*
 
-    python -m pip install --upgrade pip
-pip install alembic # Atualizar pip e instalar dependências
-    alembic init alembic # Inicializar Alembic (apenas primeira vez)
-    pip freeze > requirements.txt # Criar arquivo de requirements
-    # Aplicar migrações existentes
-    make migrate
+# 2. Criar migração inicial
+PYTHONPATH=$PYTHONPATH:$(pwd) alembic revision --autogenerate -m "init_db"
 
-    # Criar nova migração
-    make create-migrations d="init_db"
+# 3. Aplicar migração
+PYTHONPATH=$PYTHONPATH:$(pwd) alembic upgrade head
+
+# 4. Verificar tabelas criadas
+psql -U workout -d workout -h db -c "\dt"
+
+# 5. Verificar estrutura das tabelas
+psql -U workout -d workout -h db -c "\d atletas"
+psql -U workout -d workout -h db -c "\d categorias"
+psql -U workout -d workout -h db -c "\d centros_treinamento"
+```
+
+### 🔍 Troubleshooting
+
+Se encontrar o erro "Can't locate revision":
+```bash
+# Remover migrações antigas
+rm -rf alembic/versions/*
+
+# Recriar migrations do zero
+PYTHONPATH=$PYTHONPATH:$(pwd) alembic revision --autogenerate -m "init_db"
+PYTHONPATH=$PYTHONPATH:$(pwd) alembic upgrade head
+
 ```
 
 
