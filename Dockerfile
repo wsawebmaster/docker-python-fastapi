@@ -41,18 +41,13 @@ RUN pip install fastapi uvicorn sqlalchemy psycopg2-binary alembic
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-# Copy Makefile first
-COPY Makefile ./
-
-# Copy Makefile and alembic files first
+# Copy Makefile and configuration files
 COPY Makefile alembic.ini ./
 COPY alembic ./alembic/
 
 # Copy the rest of the application
 COPY . .
 
-# Initialize database schema
-# RUN PYTHONPATH=. make migrate && \
-#     PYTHONPATH=. make create-migrations d="init_db"
-
-CMD ["python", "app.py"]
+# Set Python path and run app
+ENV PYTHONPATH=/code
+CMD ["uvicorn", "workout_api.main:app", "--host", "0.0.0.0", "--port", "8000"]
