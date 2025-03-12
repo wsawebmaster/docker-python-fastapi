@@ -1,0 +1,14 @@
+
+# Consultas 
+
+# Documentação da API
+GET http://localhost:8000/docs
+Accept: application/json
+
+# Consultar todos os Atletas
+# GET http://127.0.0.1:8000/atletas/?limit=100&offset=0
+# Accept: application/json
+
+# POST http://localhost:8000/atletas
+# Content-Type: application/json
+

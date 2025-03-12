@@ -1,75 +1,83 @@
-# FastAPI
-### Quem é o FastAPi?
-Framework FastAPI, alta performance, fácil de aprender, fácil de codar, pronto para produção.
-FastAPI é um moderno e rápido (alta performance) framework web para construção de APIs com Python 3.6 ou superior, baseado nos type hints padrões do Python.
+# 📂 Desenvolvendo API com FastAPI, Python e Docker
 
-### Async
-Código assíncrono apenas significa que a linguagem tem um jeito de dizer para o computador / programa que em certo ponto, ele terá que esperar por algo para finalizar em outro lugar
+## 📃 Descrição
 
-# Projeto
-## WorkoutAPI
+Neste projeto, iremos desenvolver uma poderosa API assíncrona para uma academia, focada em uma competição de Crossfit. Essa experiência nos ajudará a entender e lidar com operações simultâneas de maneira eficaz e escalável.
 
-Esta é uma API de competição de crossfit chamada WorkoutAPI (isso mesmo rs, eu acabei unificando duas coisas que gosto: codar e treinar). É uma API pequena, devido a ser um projeto mais hands-on e simplificado nós desenvolveremos uma API de poucas tabelas, mas com o necessário para você aprender como utilizar o FastAPI.
+## 🚀 Tecnologias Utilizadas
+
+- Python
+- FastAPI
+- Alembic
+- Docker
+- SQLAlchemy
+- Pydantic
+- PostgreSQL
+- Git e Github
 
 ## Modelagem de entidade e relacionamento - MER
 ![MER](/mer.jpg "Modelagem de entidade e relacionamento")
 
-## Stack da API
+### Subir Containers do Projeto
 
-A API foi desenvolvida utilizando o `fastapi` (async), junto das seguintes libs: `alembic`, `SQLAlchemy`, `pydantic`. Para salvar os dados está sendo utilizando o `postgres`, por meio do `docker`.
+    docker-compose up -d
 
-## Execução da API
+### Acessar 
+API: [http://localhost:8000/docs](http://localhost:8000/docs)<br /><br />
 
-Para executar o projeto, utilizei a [pyenv](https://github.com/pyenv/pyenv), com a versão 3.11.4 do `python` para o ambiente virtual.
 
-Caso opte por usar pyenv, após instalar, execute:
+Acessar o container python
+```sh
+# Acessar o container
+docker-compose exec python bash
 
-```bash
-pyenv virtualenv 3.11.4 workoutapi
-pyenv activate workoutapi
-pip install -r requirements.txt
+# 1. Limpar migrações existentes (se necessário)
+rm -rf alembic/versions/*
+
+# 2. Criar migração inicial
+PYTHONPATH=$PYTHONPATH:$(pwd) alembic revision --autogenerate -m "init_db"
+
+# 3. Aplicar migração
+PYTHONPATH=$PYTHONPATH:$(pwd) alembic upgrade head
+
+# 4. Verificar tabelas criadas
+psql -U workout -d workout -h db -c "\dt"
+
+# 5. Verificar estrutura das tabelas
+psql -U workout -d workout -h db -c "\d atletas"
+psql -U workout -d workout -h db -c "\d categorias"
+psql -U workout -d workout -h db -c "\d centros_treinamento"
 ```
-Para subir o banco de dados, caso não tenha o [docker-compose](https://docs.docker.com/compose/install/linux/) instalado, faça a instalação e logo em seguida, execute:
 
+### 🔍 Troubleshooting
+
+Se encontrar o erro "Can't locate revision":
 ```bash
-make run-docker
-```
-Para criar uma migration nova, execute:
+# Remover migrações antigas
+rm -rf alembic/versions/*
 
-```bash
-make create-migrations d="nome_da_migration"
-```
+# Recriar migrations do zero
+PYTHONPATH=$PYTHONPATH:$(pwd) alembic revision --autogenerate -m "init_db"
+PYTHONPATH=$PYTHONPATH:$(pwd) alembic upgrade head
 
-Para criar o banco de dados, execute:
-
-```bash
-make run-migrations
 ```
 
-## API
+### Atualizar o conteúdo do requirements.txt
 
-Para subir a API, execute:
-```bash
-make run
-```
-e acesse: http://127.0.0.1:8000/docs
+    pip freeze > requirements.txt
 
-# Desafio Final
-    - adicionar query parameters nos endpoints
-        - atleta
-            - nome
-            - cpf
-    - customizar response de retorno de endpoints
-        - get all
-            - atleta
-                - nome
-                - centro_treinamento
-                - categoria
-    - Manipular exceção de integridade dos dados em cada módulo/tabela
-        - sqlalchemy.exc.IntegrityError e devolver a seguinte mensagem: “Já existe um atleta cadastrado com o cpf: x”
-        - status_code: 303
-    - Adicionar paginação utilizando a lib: fastapi-pagination
-        - limit e offset
+### Instalar todas dependências
+
+    pip install -r requirements.txt
+
+### Remover todos os contêineres, redes e volumes definidos no arquivo docker-compose.yml
+
+    docker-compose down
+
+### Remover contêineres, imagens e limpar redes não utilizadas.
+
+    [ "$(docker ps -q)" ] && docker stop $(docker ps -q); [ "$(docker ps -aq)" ] && docker rm $(docker ps -aq); [ "$(docker images -q)" ] && docker rmi $(docker images -q); docker network prune -f
+
 # Referências
 
 FastAPI: https://fastapi.tiangolo.com/
@@ -81,3 +89,12 @@ SQLAlchemy: https://docs.sqlalchemy.org/en/20/
 Alembic: https://alembic.sqlalchemy.org/en/latest/
 
 Fastapi-pagination: https://uriyyo-fastapi-pagination.netlify.app/
+    
+---
+---
+
+### 📧 Contato
+
+[LinkedIn](https://www.linkedin.com/in/wsawebmaster/)
+
+[wsawebmaster@yahoo.com.br](mailto:wsawebmaster@yahoo.com.br)
